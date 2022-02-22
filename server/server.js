@@ -79,6 +79,48 @@ app.put("/api/v1/users/:id", async (req, res) => {
   }
 });
 
+// Update all foreign key instances of user
+// to a foreign key referencing "deleted user" user.
+app.put("/api/v1/users/:id/delete_user", async (req, res) => {
+  try {
+    const updateIssueMemebers = await db.query(
+      "update issue_members set employee_id = 6 where employee_id = $1 returning *",
+      [req.params.id]
+    );
+    const updateIssueCreator = await db.query(
+      "update issues set creator_id = 6 where creator_id = $1 returning *",
+      [req.params.id]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        issueMember: updateIssueMemebers.rows[0],
+        issueCreator: updateIssueCreator.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Delete a user
+app.delete("/api/v1/users/:id", async (req, res) => {
+  try {
+    const deleteProjectMember = await db.query(
+      "delete from project_members where member_id = $1",
+      [req.params.id]
+    );
+    const deleteUser = await db.query("delete from users where id = $1", [
+      req.params.id,
+    ]);
+    res.status(202).json({
+      status: "sucess",
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server has started on port ${port}`);
