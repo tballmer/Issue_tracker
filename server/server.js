@@ -47,8 +47,8 @@ app.get("/api/v1/users/:id", async (req, res) => {
 app.post("/api/v1/users", async (req, res) => {
   try {
     const results = await db.query(
-      "insert into users (name) values ($1) returning *",
-      [req.body.name]
+      "insert into users (first_name, last_name, email) values ($1, $2, $3) returning *",
+      [req.body.first_name, req.body.last_name, req.body.email]
     );
     res.status(201).json({
       status: "success",
@@ -65,8 +65,8 @@ app.post("/api/v1/users", async (req, res) => {
 app.put("/api/v1/users/:id", async (req, res) => {
   try {
     const results = await db.query(
-      "Update users set name = $1 where id = $2 returning *",
-      [req.body.name, req.params.id]
+      "Update users set first_name = $1, last_name = $2, email = $3 where id = $4 returning *",
+      [req.body.first_name, req.body.last_name, req.body.email, req.params.id]
     );
     res.status(200).json({
       status: "success",
@@ -111,6 +111,99 @@ app.delete("/api/v1/users/:id", async (req, res) => {
       [req.params.id]
     );
     const deleteUser = await db.query("delete from users where id = $1", [
+      req.params.id,
+    ]);
+    res.status(202).json({
+      status: "sucess",
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Get all projects
+app.get("/api/v1/projects", async (req, res) => {
+  try {
+    const results = await db.query("select * from projects");
+    res.status(200).json({
+      status: "success",
+      results: results.rows.length,
+      data: {
+        projects: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Get a Project
+app.get("/api/v1/projects/:id", async (req, res) => {
+  try {
+    const results = await db.query("select * from projects where id = $1", [
+      req.params.id,
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        project: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Create a Project
+app.post("/api/v1/projects", async (req, res) => {
+  try {
+    const results = await db.query(
+      "insert into projects (creator_id, title, description) values ($1, $2, $3) returning *",
+      [req.body.creator_id, req.body.title, req.body.description]
+    );
+    res.status(201).json({
+      status: "success",
+      data: {
+        project: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Update a Project
+app.put("/api/v1/projects/:id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "Update projects set title = $1, description = $2 where id = $3 returning *",
+      [req.body.title, req.body.description, req.params.id]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        projects: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Delete a Project
+app.delete("/api/v1/projects/:id", async (req, res) => {
+  try {
+    const deleteProjectMembers = await db.query(
+      "delete from project_members where project_id = $1",
+      [req.params.id]
+    );
+    // Issue_members are set to delete on cascade so the only query
+    // needed to delete them is to issues
+    const deleteIssues = await db.query(
+      "delete from issues where project_id = $1",
+      [req.params.id]
+    );
+    const deleteProject = await db.query("delete from projects where id = $1", [
       req.params.id,
     ]);
     res.status(202).json({
