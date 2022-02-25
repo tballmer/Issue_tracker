@@ -299,6 +299,188 @@ app.delete("/api/v1/project_members/:id", async (req, res) => {
   }
 });
 
+// Get all issues
+app.get("/api/v1/issues", async (req, res) => {
+  try {
+    const results = await db.query("select * from issues");
+    res.status(200).json({
+      status: "success",
+      results: results.rows.length,
+      data: {
+        issues: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Get an issue
+app.get("/api/v1/issues/:id", async (req, res) => {
+  try {
+    const results = await db.query("select * from issues where id = $1", [
+      req.params.id,
+    ]);
+    res.status(200).json({
+      status: "success",
+      data: {
+        issue: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Create an issue
+app.post("/api/v1/issues", async (req, res) => {
+  try {
+    const results = await db.query(
+      "insert into issues (project_id, creator_id, title, description, priority, status) values ($1, $2, $3, $4, $5, $6) returning *",
+      [
+        req.body.project_id,
+        req.body.creator_id,
+        req.body.title,
+        req.body.description,
+        req.body.priority,
+        req.body.status,
+      ]
+    );
+    res.status(201).json({
+      status: "success",
+      data: {
+        issue: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Update an issue
+app.put("/api/v1/issues/:id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "Update issues set project_id = $1, creator_id = $2, title = $3, description = $4, priority = $5, status = $6 where id = $7 returning *",
+      [
+        req.body.project_id,
+        req.body.creator_id,
+        req.body.title,
+        req.body.description,
+        req.body.priority,
+        req.body.status,
+        req.params.id,
+      ]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        issue: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Delete an Issue
+app.delete("/api/v1/issues/:id", async (req, res) => {
+  try {
+    const results = await db.query("delete from issues where id = $1", [
+      req.params.id,
+    ]);
+    res.status(202).json({
+      status: "sucess",
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Get all issue members
+app.get("/api/v1/issue_members", async (req, res) => {
+  try {
+    const results = await db.query("select * from issue_members");
+    res.status(200).json({
+      status: "success",
+      results: results.rows.length,
+      data: {
+        issue_members: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Get an issue member
+app.get("/api/v1/issue_members/:id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "select * from issue_members where id = $1",
+      [req.params.id]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        issue_member: results.rows,
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Create an issue member
+app.post("/api/v1/issue_members", async (req, res) => {
+  try {
+    const results = await db.query(
+      "insert into issue_members (issue_id, employee_id) values ($1, $2) returning *",
+      [req.body.issue_id, req.body.employee_id]
+    );
+    res.status(201).json({
+      status: "success",
+      data: {
+        issue_member: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Update an issue member
+app.put("/api/v1/issue_members/:id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "Update issue_members set issue_id = $1, employee_id = $2 where id = $3 returning *",
+      [req.body.issue_id, req.body.employee_id, req.params.id]
+    );
+    res.status(200).json({
+      status: "success",
+      data: {
+        issue_member: results.rows[0],
+      },
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// Delete an issue member
+app.delete("/api/v1/issue_members/:id", async (req, res) => {
+  try {
+    const results = await db.query("delete from issue_members where id = $1", [
+      req.params.id,
+    ]);
+    res.status(202).json({
+      status: "sucess",
+    });
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
   console.log(`Server has started on port ${port}`);
