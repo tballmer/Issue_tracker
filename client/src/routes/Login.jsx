@@ -11,8 +11,15 @@ import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
+// import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  // const navigate = useNavigate();
+
+  // const handleSignUp = () => {
+  //   navigate("/sign-up");
+  // };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -65,12 +72,12 @@ const Login = () => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link href="" variant="body2">
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link variant="body2" href="/sign-up">
                 Don't have an account? Sign Up
               </Link>
             </Grid>
