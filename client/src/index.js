@@ -7,14 +7,19 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import SignUp from "./routes/SignUp";
+import Dashboard from "./routes/Dashboard";
+import Tickets from "./routes/Tickets";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/sign-in" element={<Login />} />
-        <Route path="/sign-up" element={<SignUp />} />
+        <Route path="" element={<Home />} />
+        <Route path="sign-in" element={<Login />} />
+        <Route path="sign-up" element={<SignUp />} />
+        <Route path="dashboard" element={<Dashboard />}>
+          <Route path="tickets" element={<Tickets />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
