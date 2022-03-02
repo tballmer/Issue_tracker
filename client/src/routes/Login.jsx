@@ -11,15 +11,8 @@ import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
-// import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  // const navigate = useNavigate();
-
-  // const handleSignUp = () => {
-  //   navigate("/sign-up");
-  // };
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
