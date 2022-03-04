@@ -9,28 +9,23 @@ import {
   TableBody,
 } from "@mui/material";
 import Button from "@mui/material/Button";
-import db from "../apis/ProjectFinder";
+// import db from "../apis/ProjectFinder";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useNavigate } from "react-router-dom";
+import { ProjectContext } from "../context/ProjectContext";
+import { useContext } from "react";
 
 const Projects = () => {
-  const [projects, setProjects] = useState([]);
+  const { projects } = useContext(ProjectContext);
+  let navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await db.get("/projects");
-        setProjects(response.data.data.projects);
-        // console.log(response.data.data.projects);
-      } catch (error) {
-        console.error(error.message);
-      }
-    };
-    fetchData();
-  }, []);
+  const handleProjectSelect = (id) => {
+    navigate(`/user/projects/${id}`);
+  };
 
   return (
-    <Paper sx={{ width: "100%" }}>
+    <Paper elevation={3} sx={{ width: "100%" }}>
       <TableContainer>
         <Table sx={{ minWidth: 500 }} aria-label="projects table">
           <TableHead>
@@ -48,7 +43,12 @@ const Projects = () => {
             {projects.map((row) => (
               <TableRow
                 key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                hover
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  "&:hover": { cursor: "pointer" },
+                }}
+                onClick={() => handleProjectSelect(row.id)}
               >
                 <TableCell component="th" scope="row">
                   {row.title}

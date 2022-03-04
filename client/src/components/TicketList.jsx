@@ -1,9 +1,11 @@
+import Paper from "@mui/material/Paper";
 import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
-const Tickets = () => {
+const TicketList = (project_id) => {
   return (
+    // <Paper></Paper>
     <Box>
       <Typography component="h3" variant="h5">
         Testing
@@ -12,4 +14,4 @@ const Tickets = () => {
   );
 };
 
-export default Tickets;
+export default TicketList;
