@@ -1,5 +1,6 @@
 const db = require("../db");
 const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcrypt");
 
 // Get All Users
 const getUsers = asyncHandler(async (req, res) => {
@@ -28,9 +29,11 @@ const getUser = asyncHandler(async (req, res) => {
 
 // Create a User
 const createUser = asyncHandler(async (req, res) => {
+  const hashpass = await bcrypt.hash(req.body.password, 10);
+
   const results = await db.query(
     "insert into users (first_name, last_name, email, hashpass) values ($1, $2, $3, $4) returning *",
-    [req.body.first_name, req.body.last_name, req.body.email, req.body.password]
+    [req.body.first_name, req.body.last_name, req.body.email, hashpass]
   );
 
   res.status(201).json({
