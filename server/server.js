@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
+const { errorHandler } = require("./middleware/errorMiddleware");
 
 // Middleware
 app.use(cors());
@@ -23,6 +24,9 @@ app.use("/api/v1/issues", require("./routes/issueRoutes"));
 
 // Issue Members
 app.use("/api/v1/issue_members", require("./routes/issueMemberRoutes"));
+
+// Error handler
+app.use(errorHandler);
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
