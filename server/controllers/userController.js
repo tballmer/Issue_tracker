@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 
 // Get All Users
 const getUsers = asyncHandler(async (req, res) => {
-  const results = await b.query("select * from users");
+  const results = await db.query("select * from users");
   res.status(200).json({
     status: "success",
     results: results.rows.length,
@@ -29,14 +29,31 @@ const getUser = asyncHandler(async (req, res) => {
 // Create a User
 const createUser = asyncHandler(async (req, res) => {
   const results = await db.query(
-    "insert into users (first_name, last_name, email) values ($1, $2, $3) returning *",
-    [req.body.first_name, req.body.last_name, req.body.email]
+    "insert into users (first_name, last_name, email, hashpass) values ($1, $2, $3, $4) returning *",
+    [req.body.first_name, req.body.last_name, req.body.email, req.body.password]
   );
+
   res.status(201).json({
     status: "success",
     data: {
       user: results.rows[0],
     },
+  });
+});
+
+// Check if user exists
+const checkUser = asyncHandler(async (req, res) => {
+  const check = await db.query("select id from users where email = $1", [
+    req.body.email,
+  ]);
+
+  if (check.rows[0] !== undefined) {
+    res.status(400);
+    throw new Error("User already exists");
+  }
+
+  res.status(200).json({
+    status: "User does not exist",
   });
 });
 
@@ -54,6 +71,7 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
+// This needs to be updated to include projects and project_members
 // Update all foreign key instances of user
 // to a foreign key referencing "deleted user" user.
 const updateUserToDeleted = asyncHandler(async (req, res) => {
@@ -95,4 +113,5 @@ module.exports = {
   updateUser,
   updateUserToDeleted,
   deleteUser,
+  checkUser,
 };

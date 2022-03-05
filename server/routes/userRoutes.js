@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db");
 const {
   getUsers,
   getUser,
@@ -8,10 +7,14 @@ const {
   updateUser,
   updateUserToDeleted,
   deleteUser,
+  checkUser,
 } = require("../controllers/userController");
 
 // Get All Users
 router.get("/", getUsers);
+
+// Check if a User Exists
+router.get("/check", checkUser);
 
 // Get a User
 router.get("/:id", getUser);
