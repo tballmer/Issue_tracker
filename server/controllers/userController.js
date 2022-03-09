@@ -1,6 +1,7 @@
 const db = require("../db");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // Get All Users
 const getUsers = asyncHandler(async (req, res) => {
@@ -39,7 +40,13 @@ const createUser = asyncHandler(async (req, res) => {
   res.status(201).json({
     status: "success",
     data: {
-      user: results.rows[0],
+      user: [
+        results.rows[0].id,
+        results.rows[0].first_name,
+        results.rows[0].last_name,
+        results.rows[0].email,
+        generateToken(results.rows[0].id),
+      ],
     },
   });
 });
@@ -58,6 +65,35 @@ const checkUser = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "User does not exist",
   });
+});
+
+// Authenticate a user
+const loginUser = asyncHandler(async (req, res) => {
+  const user = await db.query("select * from users where email = $1", [
+    req.body.email,
+  ]);
+  // console.log(user.rows[0]);
+
+  if (
+    user.rows[0] &&
+    (await bcrypt.compare(req.body.password, user.rows[0].hashpass))
+  ) {
+    res.json({
+      status: "success",
+      data: {
+        user: [
+          user.rows[0].id,
+          user.rows[0].first_name,
+          user.rows[0].last_name,
+          user.rows[0].email,
+          generateToken(user.rows[0].id),
+        ],
+      },
+    });
+  } else {
+    res.status(400);
+    throw new Error("Invalid credentials");
+  }
 });
 
 // Update a user
@@ -109,6 +145,13 @@ const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
+// Generate JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "30d",
+  });
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -117,4 +160,5 @@ module.exports = {
   updateUserToDeleted,
   deleteUser,
   checkUser,
+  loginUser,
 };

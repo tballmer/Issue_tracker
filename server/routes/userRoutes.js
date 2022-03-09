@@ -8,6 +8,7 @@ const {
   updateUserToDeleted,
   deleteUser,
   checkUser,
+  loginUser,
 } = require("../controllers/userController");
 
 // Get All Users
@@ -15,6 +16,9 @@ router.get("/", getUsers);
 
 // Check if a User Exists
 router.get("/check", checkUser);
+
+// User login
+router.get("/login", loginUser);
 
 // Get a User
 router.get("/:id", getUser);
