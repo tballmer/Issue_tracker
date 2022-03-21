@@ -9,19 +9,21 @@ const {
   deleteProject,
 } = require("../controllers/projectController");
 
-// Get all projects
-router.get("/", getProjects);
+const { protect } = require("../middleware/authMiddleware");
+
+// Get all projects to a user
+router.get("/", protect, getProjects);
 
 // Get a Project
-router.get("/:id", getProject);
+router.get("/:id", protect, getProject);
 
 // Create a Project
-router.post("/", createProject);
+router.post("/", protect, createProject);
 
 // Update a Project
-router.put("/:id", updateProject);
+router.put("/:id", protect, updateProject);
 
 // Delete a Project
-router.delete("/:id", deleteProject);
+router.delete("/:id", protect, deleteProject);
 
 module.exports = router;

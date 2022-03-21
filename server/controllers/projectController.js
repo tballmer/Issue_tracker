@@ -1,9 +1,12 @@
 const db = require("../db");
 
-// Get all projects
+// Get all projects to a user
 const getProjects = async (req, res) => {
   try {
-    const results = await db.query("select * from projects");
+    const results = await db.query(
+      "select * from projects where creator_id = $1",
+      [req.user.rows[0].id]
+    );
     res.status(200).json({
       status: "success",
       results: results.rows.length,

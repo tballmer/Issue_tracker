@@ -18,7 +18,7 @@ const getUsers = asyncHandler(async (req, res) => {
 // Get a User
 const getUser = asyncHandler(async (req, res) => {
   const results = await db.query("select * from users where id = $1", [
-    req.params.id,
+    req.user.rows[0].id,
   ]);
   res.status(200).json({
     status: "success",
@@ -57,7 +57,7 @@ const checkUser = asyncHandler(async (req, res) => {
     req.body.email,
   ]);
 
-  if (check.rows[0] !== undefined) {
+  if (check.rows[0]) {
     res.status(400);
     throw new Error("User already exists");
   }

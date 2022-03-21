@@ -11,29 +11,31 @@ const {
   loginUser,
 } = require("../controllers/userController");
 
+const { protect } = require("../middleware/authMiddleware");
+
 // Get All Users
-router.get("/", getUsers);
+router.get("/", protect, getUsers);
 
 // Check if a User Exists
-router.get("/check", checkUser);
+router.get("/check", protect, checkUser);
 
 // User login
-router.get("/login", loginUser);
+router.get("/login", protect, loginUser);
 
 // Get a User
-router.get("/:id", getUser);
+router.get("/me", protect, getUser);
 
 // Create a user
 router.post("/", createUser);
 
 // Update a user
-router.put("/:id", updateUser);
+router.put("/:id", protect, updateUser);
 
 // Update all foreign key instances of user
 // to a foreign key referencing "deleted user" user.
-router.put("/:id/delete_user", updateUserToDeleted);
+router.put("/:id/delete_user", protect, updateUserToDeleted);
 
 // Delete a user
-router.delete("/:id", deleteUser);
+router.delete("/:id", protect, deleteUser);
 
 module.exports = router;
