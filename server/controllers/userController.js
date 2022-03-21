@@ -15,7 +15,7 @@ const getUsers = asyncHandler(async (req, res) => {
   });
 });
 
-// Get a User
+// Get Current User
 const getUser = asyncHandler(async (req, res) => {
   const results = await db.query("select * from users where id = $1", [
     req.user.rows[0].id,
@@ -51,7 +51,7 @@ const createUser = asyncHandler(async (req, res) => {
   });
 });
 
-// Check if user exists
+// Check if user already exists
 const checkUser = asyncHandler(async (req, res) => {
   const check = await db.query("select id from users where email = $1", [
     req.body.email,
@@ -65,6 +65,22 @@ const checkUser = asyncHandler(async (req, res) => {
   res.status(200).json({
     status: "User does not exist",
   });
+});
+
+// Check if user is available
+const checkUserAvailability = asyncHandler(async (req, res) => {
+  const check = await db.query("select id from users where email = $1", [
+    req.body.email,
+  ]);
+
+  if (check.rows[0]) {
+    res.status(200).json({
+      status: "User exists",
+    });
+  } else {
+    res.status(400);
+    throw new Error("User does not exist");
+  }
 });
 
 // Authenticate a user
@@ -100,7 +116,12 @@ const loginUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler(async (req, res) => {
   const results = await db.query(
     "Update users set first_name = $1, last_name = $2, email = $3 where id = $4 returning *",
-    [req.body.first_name, req.body.last_name, req.body.email, req.params.id]
+    [
+      req.body.first_name,
+      req.body.last_name,
+      req.body.email,
+      req.user.rows[0].id,
+    ]
   );
   res.status(200).json({
     status: "success",
@@ -110,35 +131,43 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
-// This needs to be updated to include projects and project_members
 // Update all foreign key instances of user
 // to a foreign key referencing "deleted user" user.
 const updateUserToDeleted = asyncHandler(async (req, res) => {
   const updateIssueMemebers = await db.query(
-    "update issue_members set employee_id = 6 where employee_id = $1 returning *",
-    [req.params.id]
+    "update issue_members set employee_id = $1, where employee_id = $2 returning *",
+    [process.env.DELETED_USER_ID, req.user.rows[0].id]
   );
   const updateIssueCreator = await db.query(
-    "update issues set creator_id = 6 where creator_id = $1 returning *",
-    [req.params.id]
+    "update issues set creator_id = $1 where creator_id = $2 returning *",
+    [process.env.DELETED_USER_ID, req.user.rows[0].id]
+  );
+  const updateProjectMembers = await db.query(
+    "update project_members set member_id = $1 where member_id = $2 returning *",
+    [process.env.DELETED_USER_ID, req.user.rows[0].id]
+  );
+  const updateProjectCreator = await db.query(
+    "update projects set creator_id = $1 where creator_id = $2 returning *",
+    [process.env.DELETED_USER_ID, req.user.rows[0].id]
   );
   res.status(200).json({
     status: "success",
-    data: {
-      issueMember: updateIssueMemebers.rows[0],
-      issueCreator: updateIssueCreator.rows[0],
-    },
+    // data: {
+    //   issueMember: updateIssueMemebers.rows[0],
+    //   issueCreator: updateIssueCreator.rows[0],
+    //   peoject
+    // },
   });
 });
 
 // Delete a User
 const deleteUser = asyncHandler(async (req, res) => {
-  const deleteProjectMember = await db.query(
-    "delete from project_members where member_id = $1",
-    [req.params.id]
-  );
+  // const deleteProjectMember = await db.query(
+  //   "delete from project_members where member_id = $1",
+  //   [req.user.rows[0].id]
+  // );
   const deleteUser = await db.query("delete from users where id = $1", [
-    req.params.id,
+    req.user.rows[0].id,
   ]);
   res.status(202).json({
     status: "sucess",
@@ -161,4 +190,5 @@ module.exports = {
   deleteUser,
   checkUser,
   loginUser,
+  checkUserAvailability,
 };
