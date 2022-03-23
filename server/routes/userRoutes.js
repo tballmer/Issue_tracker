@@ -10,6 +10,7 @@ const {
   checkUser,
   loginUser,
   checkUserAvailability,
+  changePassword,
 } = require("../controllers/userController");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -24,7 +25,7 @@ router.get("/check", protect, checkUser);
 router.get("/checkAvailability", protect, checkUserAvailability);
 
 // User login
-router.get("/login", protect, loginUser);
+router.get("/login", loginUser);
 
 // Get Current User
 router.get("/me", protect, getUser);
@@ -34,6 +35,9 @@ router.post("/", createUser);
 
 // Update a user
 router.put("/", protect, updateUser);
+
+// Change password
+router.put("/change_password", protect, changePassword);
 
 // Update all foreign key instances of user
 // to a foreign key referencing "deleted user" user.

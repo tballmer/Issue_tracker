@@ -88,7 +88,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await db.query("select * from users where email = $1", [
     req.body.email,
   ]);
-  // console.log(user.rows[0]);
 
   if (
     user.rows[0] &&
@@ -127,6 +126,27 @@ const updateUser = asyncHandler(async (req, res) => {
     status: "success",
     data: {
       user: results.rows[0],
+    },
+  });
+});
+
+// Change Password
+const changePassword = asyncHandler(async (req, res) => {
+  const hashpass = await bcrypt.hash(req.body.password, 10);
+  const results = await db.query(
+    "update users set hashpass = $1 where id = $2 returning *",
+    [hashpass, req.user.rows[0].id]
+  );
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: [
+        results.rows[0].id,
+        results.rows[0].first_name,
+        results.rows[0].last_name,
+        results.rows[0].email,
+        generateToken(results.rows[0].id),
+      ],
     },
   });
 });
@@ -186,6 +206,7 @@ module.exports = {
   getUser,
   createUser,
   updateUser,
+  changePassword,
   updateUserToDeleted,
   deleteUser,
   checkUser,
