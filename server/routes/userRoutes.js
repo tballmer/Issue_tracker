@@ -19,7 +19,7 @@ const { protect } = require("../middleware/authMiddleware");
 router.get("/", protect, getUsers);
 
 // Check if a User Exists
-router.get("/check", protect, checkUser);
+router.post("/check", checkUser);
 
 // Check if a User is Available
 router.get("/checkAvailability", protect, checkUserAvailability);

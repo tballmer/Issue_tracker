@@ -53,17 +53,24 @@ const createUser = asyncHandler(async (req, res) => {
 
 // Check if user already exists
 const checkUser = asyncHandler(async (req, res) => {
+  // console.log(req.headers);
+  // console.log(req.body);
   const check = await db.query("select id from users where email = $1", [
     req.body.email,
   ]);
 
+  //console.log(check.rows[0]);
+  let doesExist = false;
+  let status = "User does not exist";
+
   if (check.rows[0]) {
-    res.status(400);
-    throw new Error("User already exists");
+    doesExist = true;
+    status = "User already exists";
   }
 
   res.status(200).json({
-    status: "User does not exist",
+    status,
+    doesExist,
   });
 });
 
