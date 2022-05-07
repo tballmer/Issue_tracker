@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -14,25 +14,28 @@ import Dashboard from "./routes/Dashboard";
 import Project from "./routes/Project";
 import { PageContextProvider } from "./context/PageContext";
 import { ProjectContextProvider } from "./context/ProjectContext";
+import { AuthContextProvider } from "./context/AuthContext";
 
 ReactDOM.render(
   <React.StrictMode>
-    <PageContextProvider>
-      <ProjectContextProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="sign-in" element={<Login />} />
-            <Route path="sign-up" element={<SignUp />} />
-            <Route path="user" element={<Nav />}>
-              <Route path="" element={<Dashboard />} />
-              <Route path="tickets" element={<Tickets />} />
-              <Route path="projects/:id" element={<Project />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </ProjectContextProvider>
-    </PageContextProvider>
+    <AuthContextProvider>
+      <PageContextProvider>
+        <ProjectContextProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="sign-in" element={<Login />} />
+              <Route path="sign-up" element={<SignUp />} />
+              <Route path="user" element={<Nav />}>
+                <Route path="" element={<Dashboard />} />
+                <Route path="tickets" element={<Tickets />} />
+                <Route path="projects/:id" element={<Project />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ProjectContextProvider>
+      </PageContextProvider>
+    </AuthContextProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

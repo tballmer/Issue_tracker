@@ -13,8 +13,12 @@ import Link from "@mui/material/Link";
 import LockOutlined from "@mui/icons-material/LockOutlined";
 import db from "../apis/ProjectFinder";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import Cookies from "js-cookie";
 
 const SignUp = () => {
+  const { setAuth } = useContext(AuthContext);
   let navigate = useNavigate();
   const [formdata, setFormData] = useState({
     first_name: "",
@@ -68,7 +72,19 @@ const SignUp = () => {
               email,
               password,
             });
-            navigate("/user");
+            //console.log(register.data.data.user);
+            const [id, firstName, lastName, db_email, jwt] =
+              register.data.data.user;
+            //console.log(id, firstName, lastName, db_email, jwt);
+            setAuth({
+              id,
+              firstName,
+              lastName,
+              db_email,
+              jwt,
+            });
+            Cookies.set("jwt", jwt, { expires: 7 });
+            //navigate("/user");
           }
         }
       }
