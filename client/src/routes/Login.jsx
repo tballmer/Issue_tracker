@@ -13,18 +13,19 @@ import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import { useState } from "react";
 import db from "../apis/ProjectFinder";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
 import Cookies from "js-cookie";
+import useAuth from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formdata, setFormData] = useState({
     email: "",
     password: "",
   });
+  let navigate = useNavigate();
   const [error, setError] = useState("");
   const { email, password } = formdata;
-  const { setAuth } = useContext(AuthContext);
+  const { setAuth } = useAuth();
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -55,6 +56,7 @@ const Login = () => {
           jwt,
         });
         Cookies.set("jwt", jwt, { expires: 7 });
+        navigate("/user");
       }
     } catch (error) {
       setError("Invalid Credentials");
