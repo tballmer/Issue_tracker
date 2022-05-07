@@ -72,10 +72,9 @@ const SignUp = () => {
               email,
               password,
             });
-            //console.log(register.data.data.user);
             const [id, firstName, lastName, db_email, jwt] =
               register.data.data.user;
-            //console.log(id, firstName, lastName, db_email, jwt);
+
             setAuth({
               id,
               firstName,

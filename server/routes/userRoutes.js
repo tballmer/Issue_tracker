@@ -25,7 +25,7 @@ router.post("/check", checkUser);
 router.get("/checkAvailability", protect, checkUserAvailability);
 
 // User login
-router.get("/login", loginUser);
+router.post("/login", loginUser);
 
 // Get Current User
 router.get("/me", protect, getUser);

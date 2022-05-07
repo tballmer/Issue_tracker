@@ -11,8 +11,56 @@ import Checkbox from "@mui/material/Checkbox";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
+import { useState } from "react";
+import db from "../apis/ProjectFinder";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import Cookies from "js-cookie";
 
 const Login = () => {
+  const [formdata, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const { email, password } = formdata;
+  const { setAuth } = useContext(AuthContext);
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const onSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      // Check if all fields are filled out
+      if (Object.values(formdata).some((x) => x === "")) {
+        setError("Please fill out all fields");
+      } else {
+        setError("");
+        const login = await db.post("/users/login", {
+          email,
+          password,
+        });
+        const [id, firstName, lastName, db_email, jwt] = login.data.data.user;
+
+        setAuth({
+          id,
+          firstName,
+          lastName,
+          db_email,
+          jwt,
+        });
+        Cookies.set("jwt", jwt, { expires: 7 });
+      }
+    } catch (error) {
+      setError("Invalid Credentials");
+    }
+  };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -30,6 +78,11 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
+        {error !== "" ? (
+          <Typography sx={{ color: "red", marginTop: 2 }}>{error}</Typography>
+        ) : (
+          ""
+        )}
         <Box component="form" sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -38,7 +91,9 @@ const Login = () => {
             id="email"
             label="Email Address"
             name="email"
+            value={email}
             autoComplete="email"
+            onChange={onChange}
             autoFocus
           />
           <TextField
@@ -49,6 +104,8 @@ const Login = () => {
             label="Password"
             type="password"
             id="password"
+            value={password}
+            onChange={onChange}
             autoComplete="current-password"
           />
           <FormControlLabel
@@ -60,6 +117,7 @@ const Login = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            onClick={onSubmit}
           >
             Sign In
           </Button>
